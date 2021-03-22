@@ -21,6 +21,7 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.numeric_std.all;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -58,13 +59,21 @@ architecture Behavioral of main is
     
 signal reset_int, signeA, signeB, signeR: std_logic;
 signal int_OperatorA, int_OperatorB, int_DataOutput1, int_DataOutput2: std_logic_vector(4 downto 0); --señales internas de los operadores 
+signal internal_Output: integer:=0;
 signal d7s: std_logic_vector(63 downto 0) := (others => '1');
 begin
 d7s(31 downto 24) <= "10110111";                            --Display '='
-
 process(clk)
 begin
     if(clk'event and clk = '1') then
+        case(OpS) is
+            when "10000001" =>
+                internal_Output <= to_integer(signed(int_OperatorA)) + to_integer(signed(int_OperatorB));
+            when "01000001" =>
+                internal_Output <= to_integer(signed(int_OperatorA)) - to_integer(signed(int_OperatorB));
+            when "00100001" =>
+                internal_Output <= to_integer(signed(int_OperatorA)) - to_integer(signed(int_OperatorB));
+            end case;
         --Desplegar valores en display    
         case(signeA) is                                     --Signo Número A
         when '1' => d7s(63 downto 56) <= "10111111";        -- negativo
